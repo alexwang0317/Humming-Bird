@@ -2,54 +2,67 @@ import sounddevice as sd
 import numpy as np
 import whisper
 
-# Load the Whisper model
-model = whisper.load_model("base")
+class AudioRecorder:
+    def __init__(self, model_name='base', device_name='MacBook Pro Microphone', sample_rate=16000, duration=10, amplification_factor=10.0):
+        # Load the Whisper model
+        self.model = whisper.load_model(model_name)
+        # Set the recording device
+        sd.default.device = device_name
+        # Set the audio parameters
+        self.sample_rate = sample_rate
+        self.duration = duration
+        self.amplification_factor = amplification_factor
+        self.audio_data = []
 
-# Setting device. Change this to the appropriate device for your system, found in bluetooth. 
-sd.default.device = 'MacBook Pro Microphone'
+    def callback(self, indata, frames, time, status):
+        """This function is called for each audio block."""
+        if status:
+            print(status, flush=True)
+        # Append the audio data to the list
+        self.audio_data.append(indata.copy())
 
+    def record_audio(self):
+        """Start recording audio."""
+        print("Listening... Press Ctrl+C to stop.")
+        try:
+            with sd.InputStream(callback=self.callback, channels=1, samplerate=self.sample_rate):
+                while True:
+                    sd.sleep(int(self.duration * 1000))
+        except KeyboardInterrupt:
+            print("Stopping...")
 
-# Define audio parameters
-sample_rate = 16000
-duration = 10  # Duration of each audio segment in seconds
-audio_data = []
+    def process_audio(self):
+        """Process the recorded audio."""
+        # Convert the list of audio data to a single numpy array
+        audio_data = np.concatenate(self.audio_data, axis=0).flatten()
 
-def callback(indata, frames, time, status):
-    """This function will be called for each audio block."""
-    if status:
-        print(status, flush=True)
-    
-    # Append the audio data to the list
-    audio_data.append(indata.copy())
+        # Normalize the audio data based on peak volume
+        max_val = np.max(np.abs(audio_data))
+        if max_val > 0:
+            audio_data /= max_val
 
-# Start the audio stream
-print("Listening... Press Ctrl+C to stop.")
-try:
-    with sd.InputStream(callback=callback, channels=1, samplerate=sample_rate):
-        while True:
-            sd.sleep(int(duration * 1000))
-except KeyboardInterrupt:
-    print("Stopping...")
+        # Optionally amplify the audio signal if needed
+        audio_data *= self.amplification_factor
 
-# Convert the list of audio data to a single numpy array
-audio_data = np.concatenate(audio_data, axis=0).flatten()
+        # Ensure the amplified data is within the expected range
+        audio_data = np.clip(audio_data, -1.0, 1.0)
 
-# Normalize the audio data based on peak volume
-max_val = np.max(np.abs(audio_data))
-if max_val > 0:
-    audio_data /= max_val
+        return audio_data
 
-# Optionally amplify the audio signal if needed
-amplification_factor = 10.0  # Adjust as needed
-audio_data *= amplification_factor
+    def transcribe_audio(self, audio_data):
+        """Transcribe the processed audio data."""
+        result = self.model.transcribe(audio_data, fp16=False)
+        transcription = result['text']
+        return transcription
 
-# Ensure the amplified data is within the expected range
-audio_data = np.clip(audio_data, -1.0, 1.0)
+    def run(self):
+        """Run the full audio recording and transcription process."""
+        self.record_audio()
+        processed_audio = self.process_audio()
+        transcription = self.transcribe_audio(processed_audio)
+        print("Transcription:")
+        return transcription
 
-# Transcribe the audio data
-result = model.transcribe(audio_data, fp16=False)
-transcription = result['text']
-
-# Output the transcription
-print("Transcription:")
-print(transcription)
+# Instantiate the AudioRecorder class and run it
+audio_recorder = AudioRecorder()
+audio_recorder.run()
