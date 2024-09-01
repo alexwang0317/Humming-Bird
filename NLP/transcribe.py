@@ -63,7 +63,3 @@ class AudioRecorder:
         print("Transcription:")
         print(transcription)
         return transcription
-
-# Instantiate the AudioRecorder class and run it
-audio_recorder = AudioRecorder()
-audio_recorder.run()
