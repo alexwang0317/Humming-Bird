@@ -61,6 +61,7 @@ class AudioRecorder:
         processed_audio = self.process_audio()
         transcription = self.transcribe_audio(processed_audio)
         print("Transcription:")
+        print(transcription)
         return transcription
 
 # Instantiate the AudioRecorder class and run it
