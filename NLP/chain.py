@@ -1,6 +1,7 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
+
 from dotenv import load_dotenv
 import os
 
@@ -24,5 +25,4 @@ _model = ChatOpenAI(openai_api_key=openai_api_key)
 # if you update this, you MUST also update ../pyproject.toml
 # with the new `tool.langserve.export_attr`
 chain = _prompt | _model
-
 
