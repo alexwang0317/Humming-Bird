@@ -35,7 +35,7 @@ class DroneCommandPlanner:
         
         # Send the prompt to OpenAI and get the response using the correct API method
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are an expert drone programming assistant."},
                 {"role": "user", "content": prompt},

@@ -2,3 +2,4 @@
 drone/
 *.pyc
 __pycache__/
+drone_script.py

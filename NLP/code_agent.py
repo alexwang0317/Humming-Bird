@@ -11,12 +11,17 @@ class MavSDKCodeGenerator:
             self.api_key = os.getenv("OPENAI_API_KEY")
         
         self.client = OpenAI(api_key=self.api_key)
+        
+
+        #  PLEASE SET THESE YOURSELF:
+        self.serial_port = "/dev/ttyS0"
+        self.baud_rate = 57600
 
     def create_prompt(self, command):
         prompt = (
             "You are an expert in drone programming using MavSDK. "
             "Generate Python code using MavSDK to execute the following command. "
-            "Include necessary imports, drone connection setup, and error handling. "
+            f"Include necessary imports, drone connection setup which should use serial port: {self.serial_port} with a baud rate of {self.baud_rate} unless otherwise specified in the command below, and error handling. "
             "Assume the script is run in an async environment. "
             "Do not include any markdown code block indicators.\n\n"
             f"Command: {command}\n\n"
@@ -28,7 +33,7 @@ class MavSDKCodeGenerator:
         prompt = self.create_prompt(command)
         
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are an expert MavSDK programmer."},
                 {"role": "user", "content": prompt},
