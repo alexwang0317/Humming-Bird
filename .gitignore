@@ -4,3 +4,4 @@ drone/
 __pycache__/
 drone_script.py
 .gitignore
+.
