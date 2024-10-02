@@ -1,9 +1,18 @@
-# The pathfinder seeks to make a path for the drone to fly between two locations using google map directions API. 
-
 import requests
 import polyline  # Library to decode polylines
+from dotenv import load_dotenv
+import os
 
-def get_route_coordinates(origin, destination, api_key):
+# Load environment variables from .env file
+load_dotenv()
+
+def get_route_coordinates(origin, destination):
+    # Get the Google API key from the environment variable
+    api_key = os.getenv('GOOGLE_API_KEY')
+    
+    if not api_key:
+        raise ValueError("API key not found. Please check your .env file.")
+    
     # API endpoint
     url = f"https://maps.googleapis.com/maps/api/directions/json?origin={origin}&destination={destination}&key={api_key}"
     
@@ -31,11 +40,10 @@ def get_route_coordinates(origin, destination, api_key):
         return None
 
 # Example usage
-api_key = "YOUR_GOOGLE_API_KEY"
-origin = "San Francisco,CA"
-destination = "Los Angeles,CA"
+origin = "Museum of Fine Arts, Boston, MA"
+destination = "Newbury Street, Boston, MA"
 
-coordinates = get_route_coordinates(origin, destination, api_key)
+coordinates = get_route_coordinates(origin, destination)
 
 if coordinates:
     print("Coordinates of the route:")
