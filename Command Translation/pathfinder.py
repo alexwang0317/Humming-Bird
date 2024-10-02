@@ -39,13 +39,13 @@ def get_route_coordinates(origin, destination):
         print(f"Error fetching directions: {response.status_code}")
         return None
 
-# Example usage
-origin = "Museum of Fine Arts, Boston, MA"
-destination = "Newbury Street, Boston, MA"
+# # Example usage
+# origin = "Museum of Fine Arts, Boston, MA"
+# destination = "Newbury Street, Boston, MA"
 
-coordinates = get_route_coordinates(origin, destination)
+# coordinates = get_route_coordinates(origin, destination)
 
-if coordinates:
-    print("Coordinates of the route:")
-    for coord in coordinates:
-        print(coord)
+# if coordinates:
+#     print("Coordinates of the route:")
+#     for coord in coordinates:
+#         print(coord)
